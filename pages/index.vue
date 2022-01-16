@@ -1,9 +1,14 @@
 <template>
-  <h2>Welcome</h2>
+  <header-s/>
 </template>
 
 <script>
+import HeaderS from '../components/Header'
+
 export default {
-  name: 'IndexPage'
+  name: 'IndexPage',
+  components: {
+    HeaderS,
+  }
 }
 </script>
