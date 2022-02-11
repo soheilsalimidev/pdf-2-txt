@@ -43,8 +43,7 @@ export default {
   ],
 
   modules: [
-    '@nuxtjs/axios',
-    '@nuxtjs/pwa'
+    '@nuxtjs/axios'
   ],
 
   serverMiddleware: [
@@ -58,10 +57,8 @@ export default {
     baseURL: '/api'
   },
 
-  pwa: {
-    manifest: {
-      lang: 'en'
-    }
+  server: {
+    port: 4500,
   },
 
   vuetify: {

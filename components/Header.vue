@@ -42,13 +42,16 @@
       <v-card
         class="send-card"
         elevation="3"
+        v-if="isCardDisplay"
+        :class="isConnected ? 'magictime vanishOut' : ''"
       >
 
-        <div class="upload-box" @click="$refs.file.click()" @dragleave="dragleave"
+        <div v-if="filelist.length === 0" class="upload-box" @click="$refs.file.click()" @dragleave="dragleave"
              @dragover="dragover" @drop="drop"
         >
 
-          <input id="assetsFieldHandle" ref="file" name="fields[assetsFieldHandle][]"
+          <input id="assetsFieldHandle" ref="file" accept="image/png, image/jpeg , application/pdf"
+                 name="fields[assetsFieldHandle][]"
                  style="display: none" type="file" @change="onChange"
           />
           <div ref="lottieDiv" style="height: 10em"></div>
@@ -61,105 +64,168 @@
             <h4 class="text-font text-center" style="font-size: .8rem">.png .jpg .pdf پشتیبانی از فرمت های </h4>
           </div>
         </div>
-
-        <div :class="showFile ? 'magictime swashIn' : ''" :style="showFile ? '' : 'display: none;'"
-             class="uploaded-file"
-        >
-          <div class="upload-details">
-            <div class="upload-time">
-              <p class="text-font text-bold text-center" style="font-size: 1rem">
-                {{
-                  uploadPersonage === 100 ? 'اپلود به اتمام رسید. تنظیمات فایل خود را انتخاب کنید' : 'در حال اپلود...'
-                }}
-              </p>
-              <p :class="uploadPersonage === 100 ? 'magictime slideUp' : ''"
-                 :style="uploadPersonage === 100 ? 'display:none' : ''" class="text-font text-light"
-                 style="font-size: .8rem; color: #757575;margin-top: .5em"
-              >
-                {{ uploadPersonage }}% . {{ timeLeft }}ثانیه
-              </p>
-            </div>
-            <div class="btn-container ms-auto">
-              <v-btn
-                v-if="uploadPersonage !== 100"
-                class="ma-2"
-                color="red"
-                fab
-                outlined
-                x-small
-              >
-                <v-icon>mdi-close</v-icon>
-              </v-btn>
-              <div ref="finishedLottie" style="width: 50px;height: 50px"></div>
-            </div>
-          </div>
-
-
-          <v-progress-linear
-            :style="uploadPersonage === 100 ? 'display:none' : ''"
-            :value="uploadPersonage"
-            color="blue"
-            stream
-            style="margin-top: 1em;"
-          ></v-progress-linear>
-
-          <v-row :class="uploadPersonage === 100 ? 'magictime puffIn' : ''"
-                 :style="uploadPersonage !== 100 ? 'display:none' : ''"
-          >
-
-            <v-col md="6" sm="12" style="padding: 0 2em;margin: 0">
-              <v-select
-                :items="['فارسی','عربی','انگلیسی']"
-                chips
-                class="text-font"
-                deletable-chips
-                hint="توجه کنید که اولیوت زبان ها اهمیت دارد!"
-                label="زبان های استفاده شده در فایل"
-                multiple
-                persistent-hint
-                style="margin: 0"
-              >
-              </v-select>
-            </v-col>
-
-            <v-col md="6" sm="12" style="padding: 0 2em;margin: 0">
-              <v-radio-group v-model="output">
-                <template v-slot:label>
-                  <div class="text-font text-bold text-large text-right">کدام خروجی را نیاز دارید</div>
-                </template>
-                <v-radio value="word">
-                  <template v-slot:label>
-                    <div class="text-font text-light text-right">تبدیل به ورد <strong class="success--text">دقت پایین
-                      تر</strong></div>
-                  </template>
-                </v-radio>
-                <v-radio value="pdf">
-                  <template v-slot:label>
-                    <div class="text-font text-light text-right"> تبدیل به پی دی اف قابل جستوجو <strong
-                      class="primary--text"
-                    >بدون خطا</strong></div>
-                  </template>
-                </v-radio>
-              </v-radio-group>
-            </v-col>
-
-          </v-row>
-
+        <div v-else-if="imgUrl" class="upload-box">
+          <v-img :src="imgUrl" style="border-radius: 15px;max-height: 17em; max-width: 100%"></v-img>
         </div>
 
+        <div :class="showSetting ? 'magictime swashIn' : ''" :style="showSetting ? '' : 'display: none;'"
+             class="uploaded-file"
+        >
+          <v-form
+            ref="form"
+            lazy-validation
+          >
+            <v-row>
+              <v-col md="1">
+                <div ref="finishedLottie" style="width: 50px;height: 50px"
+                     @click="startTheAction"
+                ></div>
+              </v-col>
+              <v-col md="5" sm="12" style="padding: 0 2em;margin: 0">
+                <v-select
+                  v-model="lang"
+                  :items="langArray"
+                  :rules="rules.select"
+                  chips
+                  class="text-font"
+                  deletable-chips
+                  hint="توجه کنید که اولیوت زبان ها اهمیت دارد!"
+                  item-text="name"
+                  item-value="lang"
+                  label="زبان های استفاده شده در فایل"
+                  multiple
+                  persistent-hint
+                  style="margin: 0"
+                >
+                </v-select>
+              </v-col>
+
+              <v-col md="6" sm="12" style="padding: 0 2em;margin: 0">
+                <v-radio-group v-model="output" :rules="rules.select">
+                  <template v-slot:label>
+                    <div class="text-font text-bold text-large text-right">کدام خروجی را نیاز دارید</div>
+                  </template>
+                  <v-radio disabled value="word">
+                    <template v-slot:label>
+                      <div class="text-font text-light text-right">تبدیل به ورد <strong class="success--text">برای فایل
+                        هایی که از عکس نیستند</strong></div>
+                    </template>
+                  </v-radio>
+                  <v-radio value="wordOcr">
+                    <template v-slot:label>
+                      <div class="text-font text-light text-right">تبدیل به متن <strong class="success--text">با استفاده
+                        از تکنولژی ocr</strong></div>
+                    </template>
+                  </v-radio>
+                  <v-radio disabled value="pdf">
+                    <template v-slot:label>
+                      <div class="text-font text-light text-right"> تبدیل به پی دی اف قابل جستوجو با تکنلوژی ocr <strong
+                        class="primary--text"
+                      >بدون خطا</strong></div>
+                    </template>
+                  </v-radio>
+                </v-radio-group>
+              </v-col>
+
+            </v-row>
+          </v-form>
+        </div>
+
+        <div :class="start ? 'magictime swashIn' : ''" :style="start ? '' : 'display: none;'">
+          <ProgressBarJob :all-pages="allPages" :page-done="finishedPages" :personage="personage" kind="local"
+          ></ProgressBarJob>
+        </div>
+
+      </v-card>
+      <v-card
+        v-if="!isCardDisplay"
+        :class="!isCardDisplay ? 'magictime vanishIn' : ''"
+        class="waiting-card"
+        elevation="3"
+      >
+        <send-email-header v-if="remain !== 0" :remain="remain"></send-email-header>
+        <div v-else>
+          <p v-if="!finished" class="text-font">
+            کار شما در حال انجام است<br>
+            این کار بسته به نوع فایل و تعداد صفحات از 1 تا 3 دقیقه زمان میبرد
+          </p>
+          <donate v-else></donate>
+        </div>
 
       </v-card>
 
     </div>
+    <v-dialog
+      v-model="finished"
+      scrollable
+      width="700"
+      @click:outside="copy"
+    >
+      <v-card>
+        <v-card-title class="text-font text-bold">
+          عملیات با موفقیت انجام شد
+        </v-card-title>
+
+        <v-card-text class="text-font text-light">
+          <v-textarea
+            :value="result"
+            auto-grow
+          >
+          </v-textarea>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            class="text-font"
+            color="primary"
+            text
+            @click="copy"
+          >
+            کپی کردن
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-snackbar
+      v-model="snackbar"
+      timeout="3000"
+    >
+      <p class="text-font">
+        متن با موفیقت کپی شد
+      </p>
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          class="text-font"
+          color="pink"
+          text
+          v-bind="attrs"
+        >
+          بستن
+        </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 
 <script>
 import Vue from 'vue'
 import lottie from 'lottie-web'
+import io from 'socket.io/client-dist/socket.io'
+import SendEmailHeader from './SendEmailHeader'
+import Donate from './Donate'
+import { createScheduler, createWorker } from 'tesseract.js'
+import ProgressBarJob from './ProgressBarJob'
 
 export default Vue.extend({
   name: 'HeaderS',
+  components: {
+    ProgressBarJob,
+    SendEmailHeader,
+    Donate
+  },
   data () {
     let self = this
     return {
@@ -225,10 +291,38 @@ export default Vue.extend({
         },
       ],
       filelist: [],
-      showFile: false,
-      uploadPersonage: 0,
+      imgUrl: '',
+      snackbar: false,
+      showSetting: false,
+      personage: 0,
+      bufferPersonage: 0,
       timeLeft: 0,
-      output: false
+      output: false,
+      socket: null,
+      savedFileName: '',
+      isConnected: false,
+      isCardDisplay: true,
+      remain: 0,
+      lang: [],
+      langArray: [{
+        name: 'فارسی',
+        lang: 'fas'
+      }, {
+        name: 'انگلیسی',
+        lang: 'eng'
+      }, {
+        name: 'عربی',
+        lang: 'ara'
+      }],
+      start: false,
+      finished: false,
+      finishedPages: 0,
+      allPages: 0,
+      result: '',
+      rules: {
+        select: [(v) => Boolean(Object.keys(v || {})[0]) || 'زبان مورد نظر خود را انتخاب کنید!!!'],
+        radio: [(v) => !!v || 'حالت مورد نظر خود را انتخاب کنید!!!'],
+      }
     }
   },
   mounted () {
@@ -254,20 +348,35 @@ export default Vue.extend({
         return (window.innerWidth * per) / 100
       }
     },
-    onChange () {
-      this.filelist = this.$refs.file.files
-      this.showFile = true
-      setTimeout(() => {
-        this.uploadPersonage = 100
-        lottie.loadAnimation({
-          container: this.$refs.finishedLottie,
-          renderer: 'svg',
-          loop: false,
-          autoplay: true,
-          animationData: require(`@/assets/lottie/finished.json`)
-        }).show()
-      }, 3000)
+    async onChange () {
+      this.filelist = this.$refs.file.files[0]
+      this.showSetting = true
+      if (this.filelist.type === 'image/png' || this.filelist.type === 'image/jpeg') {
+        this.imgUrl = URL.createObjectURL(this.filelist)
+      }
+      lottie.loadAnimation({
+        container: this.$refs.finishedLottie,
+        renderer: 'svg',
+        loop: false,
+        autoplay: true,
+        animationData: require(`@/assets/lottie/finished.json`)
+      }).show()
+    },
+    upload () {
+      const form = new FormData
+      form.append('file', this.filelist)
 
+      setInterval(() => this.timeLeft += 1, 1000)
+
+      this.$axios.$post('/upload/file', form, {
+        onUploadProgress: progressEvent => this.personage = Math.floor((progressEvent.loaded * 100) / progressEvent.total)
+      }).then(value => {
+        if (value.fileName) {
+          this.savedFileName = value.fileName
+        } else {
+
+        }
+      })
     },
     remove (i) {
       this.filelist.splice(i, 1)
@@ -286,8 +395,137 @@ export default Vue.extend({
       this.$refs.file.files = event.dataTransfer.files
       this.onChange()
       event.currentTarget.classList.remove('active-on-drag')
+    },
+    async startTheAction () {
+
+      if (this.$refs.form.validate()) {
+        switch (this.output) {
+          case 'wordOcr':
+            return this.ocrLocal()
+        }
+      }
+
+    },
+    async ocrLocal () {
+
+      this.showSetting = false
+      this.start = true
+
+      const pdfjsLib = require('pdfjs-dist/legacy/build/pdf')
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/legacy/build/pdf.worker.min.js'
+
+      const scheduler = createScheduler()
+
+      if (this.filelist.type === 'application/pdf') {
+        try {
+          for (let j of Array(5).fill(0)) {
+
+            const worker1 = createWorker()
+            await worker1.load()
+            await worker1.loadLanguage(this.lang.join('+'))
+            await worker1.initialize(this.lang.join('+'))
+            scheduler.addWorker(worker1)
+          }
+        } catch (e) {
+          console.log(e)
+        }
+        pdfjsLib.getDocument(URL.createObjectURL(this.filelist)).promise.then(async value => {
+          this.allPages = value.numPages
+          const ocrResult = Array(value.numPages - 1)
+          for (let i = 1; i <= value.numPages; i++) {
+            value.getPage(i).then(page => {
+              const viewport = page.getViewport({ scale: 1 })
+              const canvas = document.createElement('canvas')
+              const ctx = canvas.getContext('2d')
+              const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+              }
+              canvas.height = viewport.height
+              canvas.width = viewport.width
+              page.render(renderContext).promise.then(async () => {
+                const { data: { text } } = await scheduler.addJob('recognize', canvas)
+                ocrResult[i - 1] = text
+                this.finishedPages++
+                this.personage = (this.finishedPages * 100) / value.numPages
+                if (this.finishedPages === value.numPages) {
+                  this.result = ocrResult.join('\n')
+                  this.finished = true
+                  await scheduler.terminate()
+                }
+              })
+            })
+          }
+        })
+      } else {
+        const worker1 = createWorker()
+        await worker1.load()
+        await worker1.loadLanguage(this.lang.join('+'))
+        await worker1.initialize(this.lang.join('+'))
+        const { data: { text } } = await worker1.recognize(this.imgUrl)
+        this.result = text
+        this.finished = true
+        await worker1.terminate()
+      }
+    },
+    async ocrServer () {
+      await this.$axios.$post(`/ocr/${this.savedFileName}`, {}, { params: { lang: 'fas' } })
+      this.socket = io()
+
+      this.socket.emit('addJob', {
+        savedFileName: this.savedFileName,
+        lang: this.lang.join('+'),
+        output: this.output
+      })
+
+      this.socket.on('status', (mgs) => this.remain = mgs)
+      this.socket.on('result', (mgs) => {
+        const element = document.createElement('a')
+        element.setAttribute('href', window.location.origin + '/uploads/pdfs/' + mgs)
+        element.setAttribute('download', 'pdf file')
+
+        element.style.display = 'none'
+
+        document.body.appendChild(element)
+
+        element.click()
+        document.body.removeChild(element)
+      })
+      this.isConnected = true
+      setTimeout(() => {
+        this.isCardDisplay = false
+      }, 100)
+    },
+    async copy () {
+      await navigator.clipboard.writeText(this.result)
+      this.snackbar = true
+      this.filelist = []
+      this.showSetting = false
+      this.personage = 0
+      this.bufferPersonage = 0
+      this.timeLeft = 0
+      this.output = false
+      this.socket = null
+      this.savedFileName = ''
+      this.isConnected = false
+      this.isCardDisplay = true
+      this.remain = 0
+      this.lang = []
+      this.start = false
+      this.finished = false
+      this.finishedPages = 0
+      this.allPages = 0
+      this.result = ''
+      this.imgUrl = ''
+      lottie.loadAnimation({
+        container: this.$refs.lottieDiv,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        animationData: require('@/assets/lottie/scan.json')
+      })
     }
-  }
+  },
 })
 </script>
 
@@ -378,22 +616,6 @@ export default Vue.extend({
         width: 100%;
         margin-top: 2em;
 
-        .upload-details {
-          display: flex;
-          flex-direction: row;
-          width: 100%;
-
-          .upload-time {
-            display: flex;
-            flex-direction: column;
-
-            p {
-              margin: 0;
-            }
-          }
-
-        }
-
       }
 
     }
@@ -406,6 +628,22 @@ export default Vue.extend({
       margin-top: 1em;
       font-size: 1.2rem;
       font-weight: 400;
+    }
+
+    .waiting-card {
+      padding: 1em 2em;
+      width: 40%;
+      height: auto;
+      margin: 2em auto 3em;
+      left: 0;
+      right: 0;
+      text-align: center;
+      border-radius: 15px;
+
+      .queue {
+        display: flex;
+      }
+
     }
 
   }
