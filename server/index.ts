@@ -3,11 +3,11 @@ import socket from './socketConnections'
 
 const multer = require('multer')
 const storage = multer.diskStorage({
-  destination: function (req: Request, file: Express.Multer.File, callback: (error: Error | null, destination: string) => void) {
+  destination (_: Request, __: Express.Multer.File, callback: (error: Error | null, destination: string) => void) {
     callback(null, './static/uploads/pdfs')
   },
-  filename: function (req: Request, file: Express.Multer.File, callback: (error: Error | null, filename: string) => void) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+  filename (_: Request, file: Express.Multer.File, callback: (error: Error | null, filename: string) => void) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
     callback(null, file.fieldname + '-' + uniqueSuffix + '.' + file.originalname.split('.').pop())
   }
 })
@@ -29,7 +29,7 @@ app.post('/upload/file', upload.single('file'), async (req: Request, res: Respon
   await res.send({ fileName: req.file?.filename.split('.')[0] })
 })
 
-app.post('/ocr/:file', (req: Request, res: any) => {
+app.post('/ocr/:file', (_: Request, res: any) => {
   socket(res.connection.server)
   res.sendStatus(200)
 })

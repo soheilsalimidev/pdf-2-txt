@@ -8,17 +8,21 @@
               : 'در حال انجام عملیات'
           }}
         </p>
-        <p :class="personage === 100 &&   kind === 'upload' ? 'magictime slideUp' : ''"
-           :style="personage === 100 &&   kind === 'upload' ? 'display:none' : ''" class="text-font text-light"
-           style="font-size: .8rem; color: #757575;margin-top: .5em"
+        <p
+          :class="personage === 100 && kind === 'upload' ? 'magictime slideUp' : ''"
+          :style="personage === 100 && kind === 'upload' ? 'display:none' : ''"
+          class="text-font text-light"
+          style="font-size: .8rem; color: #757575;margin-top: .5em"
         >
           {{ personage }}% {{ kind === 'upload' ? `.  ${timeLeft}  ثانیه` : `${pageDone} صفحه از ${allPages}` }}
+          <br>
+          {{ kind === 'word' && personage === 90 ? 'در حال آماده سازی فایل' : '' }}
         </p>
       </div>
 
       <div class="btn-container ms-auto">
         <v-btn
-          v-if="personage !== 100 &&    kind === 'upload'"
+          v-if="personage !== 100 && kind === 'upload'"
           class="ma-2"
           color="red"
           fab
@@ -35,7 +39,7 @@
       :value="personage"
       color="blue"
       style="margin-top: 1em;"
-    ></v-progress-linear>
+    />
   </div>
 </template>
 
@@ -44,8 +48,8 @@ import Vue, { PropType } from 'vue'
 
 export default Vue.extend({
   props: {
-    kind: String as PropType<'upload' | 'local'>,
-    personage: Number,
+    kind: String as PropType<'upload' | 'wordOcr' | 'word'>,
+    personage: [Number, String],
     timeLeft: Number,
     ocrThePdf: Function,
     allPages: Number,

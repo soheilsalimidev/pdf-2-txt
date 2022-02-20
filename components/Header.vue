@@ -6,9 +6,15 @@
           <v-img :src="require('@/static/icon.png')" width="50"/>
         </div>
         <ul>
-          <li class="text-font text-bold">خانه</li>
-          <li class="text-font text-medium">چگونه</li>
-          <li class="text-font text-medium">کجا</li>
+          <li class="text-font text-bold">
+            خانه
+          </li>
+          <li class="text-font text-medium">
+            چگونه
+          </li>
+          <li class="text-font text-medium">
+            کجا
+          </li>
         </ul>
       </div>
       <v-btn
@@ -37,39 +43,53 @@
         <br>
         می توانید به ورد تبدیل کنید
       </h1>
-      <h4 class="text-font text-center"> OCR با استفاده از هوش مصنوعی و تنکولوژی </h4>
+      <h4 class="text-font text-center">
+        OCR با استفاده از هوش مصنوعی و تنکولوژی
+      </h4>
 
       <v-card
+        v-if="isCardDisplay"
         class="send-card"
         elevation="3"
-        v-if="isCardDisplay"
         :class="isConnected ? 'magictime vanishOut' : ''"
       >
-
-        <div v-if="filelist.length === 0" class="upload-box" @click="$refs.file.click()" @dragleave="dragleave"
-             @dragover="dragover" @drop="drop"
+        <div
+          v-if="fileOb"
+          class="upload-box"
+          @click="$refs.file.click()"
+          @dragleave="dragleave"
+          @dragover="dragover"
+          @drop="drop"
         >
-
-          <input id="assetsFieldHandle" ref="file" accept="image/png, image/jpeg , application/pdf"
-                 name="fields[assetsFieldHandle][]"
-                 style="display: none" type="file" @change="onChange"
-          />
-          <div ref="lottieDiv" style="height: 10em"></div>
+          <input
+            id="assetsFieldHandle"
+            ref="file"
+            accept="image/png, image/jpeg , application/pdf"
+            name="fields[assetsFieldHandle][]"
+            style="display: none"
+            type="file"
+            @change="onChange"
+          >
+          <div ref="lottieDiv" style="height: 10em"/>
           <div>
             <label class="text-font text-bold " for="assetsFieldHandle">
               فایل خود را اینجا رها کنید
               <br>
               یا <span class="blue--text">اینجا کلیک کنید</span> تا فایل خود را انتخاب کنید
             </label>
-            <h4 class="text-font text-center" style="font-size: .8rem">.png .jpg .pdf پشتیبانی از فرمت های </h4>
+            <h4 class="text-font text-center" style="font-size: .8rem">
+              .png .jpg .pdf پشتیبانی از فرمت های
+            </h4>
           </div>
         </div>
         <div v-else-if="imgUrl" class="upload-box">
-          <v-img :src="imgUrl" style="border-radius: 15px;max-height: 17em; max-width: 100%"></v-img>
+          <v-img :src="imgUrl" style="border-radius: 15px;max-height: 17em; max-width: 100%"/>
         </div>
 
-        <div :class="showSetting ? 'magictime swashIn' : ''" :style="showSetting ? '' : 'display: none;'"
-             class="uploaded-file"
+        <div
+          :class="showSetting ? 'magictime swashIn' : ''"
+          :style="showSetting ? '' : 'display: none;'"
+          class="uploaded-file"
         >
           <v-form
             ref="form"
@@ -77,11 +97,47 @@
           >
             <v-row>
               <v-col md="1">
-                <div ref="finishedLottie" style="width: 50px;height: 50px"
-                     @click="startTheAction"
-                ></div>
+                <div
+                  ref="finishedLottie"
+                  style="width: 50px;height: 50px"
+                  @click="startTheAction"
+                />
               </v-col>
-              <v-col md="5" sm="12" style="padding: 0 2em;margin: 0">
+              <v-col md="6" sm="12" style="padding: 0 2em;margin: 0">
+                <v-radio-group v-model="output" :rules="rules.select">
+                  <template #label>
+                    <div class="text-font text-bold text-large text-right">
+                      کدام خروجی را نیاز دارید
+                    </div>
+                  </template>
+                  <v-radio value="word">
+                    <template #label>
+                      <div class="text-font text-light text-right">
+                        تبدیل به ورد <strong class="success--text">برای فایل
+                        هایی که از عکس نیستند</strong>
+                      </div>
+                    </template>
+                  </v-radio>
+                  <v-radio value="wordOcr">
+                    <template #label>
+                      <div class="text-font text-light text-right">
+                        تبدیل به متن <strong class="success--text">با استفاده
+                        از تکنولژی ocr</strong>
+                      </div>
+                    </template>
+                  </v-radio>
+                  <v-radio disabled value="pdf">
+                    <template #label>
+                      <div class="text-font text-light text-right">
+                        تبدیل به پی دی اف قابل جستوجو با تکنلوژی ocr <strong
+                        class="primary--text"
+                      >بدون خطا</strong>
+                      </div>
+                    </template>
+                  </v-radio>
+                </v-radio-group>
+              </v-col>
+              <v-col v-if="output === 'wordOcr'" md="5" sm="12" style="padding: 0 2em;margin: 0">
                 <v-select
                   v-model="lang"
                   :items="langArray"
@@ -96,46 +152,20 @@
                   multiple
                   persistent-hint
                   style="margin: 0"
-                >
-                </v-select>
+                />
               </v-col>
-
-              <v-col md="6" sm="12" style="padding: 0 2em;margin: 0">
-                <v-radio-group v-model="output" :rules="rules.select">
-                  <template v-slot:label>
-                    <div class="text-font text-bold text-large text-right">کدام خروجی را نیاز دارید</div>
-                  </template>
-                  <v-radio disabled value="word">
-                    <template v-slot:label>
-                      <div class="text-font text-light text-right">تبدیل به ورد <strong class="success--text">برای فایل
-                        هایی که از عکس نیستند</strong></div>
-                    </template>
-                  </v-radio>
-                  <v-radio value="wordOcr">
-                    <template v-slot:label>
-                      <div class="text-font text-light text-right">تبدیل به متن <strong class="success--text">با استفاده
-                        از تکنولژی ocr</strong></div>
-                    </template>
-                  </v-radio>
-                  <v-radio disabled value="pdf">
-                    <template v-slot:label>
-                      <div class="text-font text-light text-right"> تبدیل به پی دی اف قابل جستوجو با تکنلوژی ocr <strong
-                        class="primary--text"
-                      >بدون خطا</strong></div>
-                    </template>
-                  </v-radio>
-                </v-radio-group>
-              </v-col>
-
             </v-row>
           </v-form>
         </div>
 
         <div :class="start ? 'magictime swashIn' : ''" :style="start ? '' : 'display: none;'">
-          <ProgressBarJob :all-pages="allPages" :page-done="finishedPages" :personage="personage" kind="local"
-          ></ProgressBarJob>
+          <ProgressBarJob
+            :all-pages="allPages"
+            :kind="output"
+            :page-done="finishedPages"
+            :personage="personage"
+          />
         </div>
-
       </v-card>
       <v-card
         v-if="!isCardDisplay"
@@ -143,17 +173,15 @@
         class="waiting-card"
         elevation="3"
       >
-        <send-email-header v-if="remain !== 0" :remain="remain"></send-email-header>
+        <send-email-header v-if="remain !== 0" :remain="remain"/>
         <div v-else>
           <p v-if="!finished" class="text-font">
             کار شما در حال انجام است<br>
             این کار بسته به نوع فایل و تعداد صفحات از 1 تا 3 دقیقه زمان میبرد
           </p>
-          <donate v-else></donate>
+          <DonateComponent v-else/>
         </div>
-
       </v-card>
-
     </div>
     <v-dialog
       v-model="finished"
@@ -170,14 +198,13 @@
           <v-textarea
             :value="result"
             auto-grow
-          >
-          </v-textarea>
+          />
         </v-card-text>
 
-        <v-divider></v-divider>
+        <v-divider/>
 
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-spacer/>
           <v-btn
             class="text-font"
             color="primary"
@@ -194,9 +221,9 @@
       timeout="3000"
     >
       <p class="text-font">
-        متن با موفیقت کپی شد
+        {{ snackText }}
       </p>
-      <template v-slot:action="{ attrs }">
+      <template #action="{ attrs }">
         <v-btn
           class="text-font"
           color="pink"
@@ -211,93 +238,92 @@
 </template>
 
 <script>
+// import io from 'socket.io/client-dist/socket.io'
 import Vue from 'vue'
 import lottie from 'lottie-web'
-import io from 'socket.io/client-dist/socket.io'
-import SendEmailHeader from './SendEmailHeader'
-import Donate from './Donate'
 import { createScheduler, createWorker } from 'tesseract.js'
-import ProgressBarJob from './ProgressBarJob'
+import { Document, Packer, Paragraph, TextRun } from 'docx'
+import { saveAs } from 'file-saver'
+import SendEmailHeader from './SendEmailHeader.vue'
+import DonateComponent from './DonateComponent.vue'
+import ProgressBarJob from './ProgressBarJob.vue'
 
 export default Vue.extend({
   name: 'HeaderS',
   components: {
     ProgressBarJob,
     SendEmailHeader,
-    Donate
+    DonateComponent
   },
   data () {
-    let self = this
+    const self = this
     return {
       btnPo: [
         {
           image: require('@/static/icon.png'),
           top: 0,
-          left: self.percent(15),
+          left: this.percent(15),
           topNew: 0,
-          leftNew: self.percent(15),
-
+          leftNew: self.percent(15)
         },
         {
           image: require('@/static/icon.png'),
           top: 60,
           left: self.percent(2),
           topNew: 60,
-          leftNew: self.percent(2),
-
+          leftNew: self.percent(2)
         },
         {
           image: require('@/static/icon.png'),
           top: 400,
           left: self.percent(8),
           topNew: 400,
-          leftNew: self.percent(8),
-
+          leftNew: self.percent(8)
         },
         {
           image: require('@/static/icon.png'),
           top: 380,
           left: self.percent(25),
           topNew: 380,
-          leftNew: self.percent(25),
+          leftNew: self.percent(25)
         },
         {
           image: require('@/static/icon.png'),
           top: 50,
           left: self.percent(30),
           topNew: 50,
-          leftNew: self.percent(30),
+          leftNew: self.percent(30)
         },
         {
           image: require('@/static/icon.png'),
           top: 20,
           left: self.percent(80),
           topNew: 20,
-          leftNew: self.percent(80),
+          leftNew: self.percent(80)
         },
         {
           image: require('@/static/icon.png'),
           top: 400,
           left: self.percent(90),
           topNew: 400,
-          leftNew: self.percent(90),
+          leftNew: self.percent(90)
         },
         {
           image: require('@/static/icon.png'),
           top: 400,
           left: self.percent(50),
           topNew: 400,
-          leftNew: self.percent(50),
-        },
+          leftNew: self.percent(50)
+        }
       ],
-      filelist: [],
+      fileOb: {},
       imgUrl: '',
       snackbar: false,
       showSetting: false,
       personage: 0,
       bufferPersonage: 0,
       timeLeft: 0,
-      output: false,
+      output: 'word',
       socket: null,
       savedFileName: '',
       isConnected: false,
@@ -320,14 +346,16 @@ export default Vue.extend({
       allPages: 0,
       result: '',
       rules: {
-        select: [(v) => Boolean(Object.keys(v || {})[0]) || 'زبان مورد نظر خود را انتخاب کنید!!!'],
-        radio: [(v) => !!v || 'حالت مورد نظر خود را انتخاب کنید!!!'],
-      }
+        select: [v => Boolean(Object.keys(v || {})[0]) || 'زبان مورد نظر خود را انتخاب کنید!!!'],
+        radio: [v => !!v || 'حالت مورد نظر خود را انتخاب کنید!!!']
+      },
+      snackText: 'متن با موفقیت کپی شد'
     }
   },
   mounted () {
     this.$vuetify.rtl = true
     lottie.loadAnimation({
+
       container: this.$refs.lottieDiv,
       renderer: 'svg',
       loop: true,
@@ -348,38 +376,43 @@ export default Vue.extend({
         return (window.innerWidth * per) / 100
       }
     },
-    async onChange () {
-      this.filelist = this.$refs.file.files[0]
+    onChange () {
+      this.fileOb = this.$refs.file?.files[0]
       this.showSetting = true
-      if (this.filelist.type === 'image/png' || this.filelist.type === 'image/jpeg') {
-        this.imgUrl = URL.createObjectURL(this.filelist)
+
+      if (this.fileOb.type === 'image/png' || this.fileOb.type === 'image/jpeg') {
+        this.imgUrl = URL.createObjectURL(this.fileOb)
       }
       lottie.loadAnimation({
+
         container: this.$refs.finishedLottie,
         renderer: 'svg',
         loop: false,
         autoplay: true,
-        animationData: require(`@/assets/lottie/finished.json`)
+        animationData: require('@/assets/lottie/finished.json')
       }).show()
     },
     upload () {
-      const form = new FormData
-      form.append('file', this.filelist)
+      const form = new FormData()
 
-      setInterval(() => this.timeLeft += 1, 1000)
+      form.append('file', this.fileOb)
+
+      setInterval(() => {
+        this.timeLeft += 1
+      }, 1000)
 
       this.$axios.$post('/upload/file', form, {
-        onUploadProgress: progressEvent => this.personage = Math.floor((progressEvent.loaded * 100) / progressEvent.total)
-      }).then(value => {
+        onUploadProgress: (progressEvent) => {
+          this.personage = Math.floor((progressEvent.loaded * 100) / progressEvent.total)
+        }
+      }).then((value) => {
         if (value.fileName) {
           this.savedFileName = value.fileName
-        } else {
-
         }
       })
     },
     remove (i) {
-      this.filelist.splice(i, 1)
+      this.fileOb.splice(i, 1)
     },
     dragover (event) {
       event.preventDefault()
@@ -396,18 +429,17 @@ export default Vue.extend({
       this.onChange()
       event.currentTarget.classList.remove('active-on-drag')
     },
-    async startTheAction () {
-
+    startTheAction () {
       if (this.$refs.form.validate()) {
         switch (this.output) {
           case 'wordOcr':
             return this.ocrLocal()
+          case 'word':
+            return this.toWord()
         }
       }
-
     },
     async ocrLocal () {
-
       this.showSetting = false
       this.start = true
 
@@ -416,10 +448,9 @@ export default Vue.extend({
 
       const scheduler = createScheduler()
 
-      if (this.filelist.type === 'application/pdf') {
+      if (this.fileOb.type === 'application/pdf') {
         try {
-          for (let j of Array(5).fill(0)) {
-
+          for (let i = 0; i < 5; i++) {
             const worker1 = createWorker()
             await worker1.load()
             await worker1.loadLanguage(this.lang.join('+'))
@@ -429,20 +460,22 @@ export default Vue.extend({
         } catch (e) {
           console.log(e)
         }
-        pdfjsLib.getDocument(URL.createObjectURL(this.filelist)).promise.then(async value => {
+
+        pdfjsLib.getDocument(URL.createObjectURL(this.fileOb)).promise.then((value) => {
           this.allPages = value.numPages
           const ocrResult = Array(value.numPages - 1)
           for (let i = 1; i <= value.numPages; i++) {
-            value.getPage(i).then(page => {
+            value.getPage(i).then((page) => {
               const viewport = page.getViewport({ scale: 1 })
               const canvas = document.createElement('canvas')
               const ctx = canvas.getContext('2d')
               const renderContext = {
                 canvasContext: ctx,
-                viewport: viewport
+                viewport
               }
               canvas.height = viewport.height
               canvas.width = viewport.width
+
               page.render(renderContext).promise.then(async () => {
                 const { data: { text } } = await scheduler.addJob('recognize', canvas)
                 ocrResult[i - 1] = text
@@ -468,43 +501,93 @@ export default Vue.extend({
         await worker1.terminate()
       }
     },
-    async ocrServer () {
-      await this.$axios.$post(`/ocr/${this.savedFileName}`, {}, { params: { lang: 'fas' } })
-      this.socket = io()
-
-      this.socket.emit('addJob', {
-        savedFileName: this.savedFileName,
-        lang: this.lang.join('+'),
-        output: this.output
-      })
-
-      this.socket.on('status', (mgs) => this.remain = mgs)
-      this.socket.on('result', (mgs) => {
-        const element = document.createElement('a')
-        element.setAttribute('href', window.location.origin + '/uploads/pdfs/' + mgs)
-        element.setAttribute('download', 'pdf file')
-
-        element.style.display = 'none'
-
-        document.body.appendChild(element)
-
-        element.click()
-        document.body.removeChild(element)
-      })
-      this.isConnected = true
-      setTimeout(() => {
-        this.isCardDisplay = false
-      }, 100)
-    },
+    // async ocrServer () {
+    //   await this.$axios.$post(`/ocr/${this.savedFileName}`, {}, { params: { lang: 'fas' } })
+    //   this.socket = io()
+    //
+    //   this.socket.emit('addJob', {
+    //     savedFileName: this.savedFileName,
+    //     lang: this.lang.join('+'),
+    //     output: this.output
+    //   })
+    //
+    //   this.socket.on('status', (mgs) => this.remain = mgs)
+    //   this.socket.on('result', (mgs) => {
+    //     const element = document.createElement('a')
+    //     element.setAttribute('href', window.location.origin + '/uploads/pdfs/' + mgs)
+    //     element.setAttribute('download', 'pdf file')
+    //
+    //     element.style.display = 'none'
+    //
+    //     document.body.appendChild(element)
+    //
+    //     element.click()
+    //     document.body.removeChild(element)
+    //   })
+    //   this.isConnected = true
+    //   setTimeout(() => {
+    //     this.isCardDisplay = false
+    //   }, 100)
+    // },
     async copy () {
       await navigator.clipboard.writeText(this.result)
+      this.clearDate('متن با موفیقت کپی شد :)')
+    },
+    toWord () {
+      this.showSetting = false
+      this.start = true
+
+      const pdfjsLib = require('pdfjs-dist/legacy/build/pdf')
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/legacy/build/pdf.worker.min.js'
+      pdfjsLib.getDocument(URL.createObjectURL(this.fileOb)).promise.then((value) => {
+        this.allPages = value.numPages
+        const pagesText = Array(value.numPages - 1)
+        for (let i = 1; i <= value.numPages; i++) {
+          value.getPage(i).then(async (page) => {
+            try {
+              pagesText[i - 1] = (await page.getTextContent()).items
+              this.finishedPages++
+              this.personage = ((this.finishedPages * 90) / value.numPages).toFixed(2)
+              if (this.finishedPages === this.allPages) {
+                return this.pdfTextToDocx(pagesText)
+              }
+            } catch (e) {
+              console.log(e)
+            }
+          })
+        }
+      })
+    },
+    pdfTextToDocx (text) {
+      const sections = [{
+        properties: {},
+        children: []
+      }]
+      for (const items of text) {
+        const paragraph = new Paragraph({
+          children: [new TextRun({
+            text: items.map(va => va.str).join(' ')
+          })]
+        })
+        sections[0].children.push(paragraph)
+      }
+      const doc = new Document({ sections })
+
+      Packer.toBlob(doc).then((blob) => {
+        saveAs(blob, this.fileOb.name + '.docx')
+        this.clearDate('عملیات با موفقیت انجام شد :)')
+      }).catch(reason => console.log(reason))
+    },
+    clearDate (snackText) {
+      this.personage = 100
       this.snackbar = true
-      this.filelist = []
+      this.snackText = snackText
+      this.fileOb = []
       this.showSetting = false
       this.personage = 0
       this.bufferPersonage = 0
       this.timeLeft = 0
-      this.output = false
+      this.output = ''
       this.socket = null
       this.savedFileName = ''
       this.isConnected = false
@@ -517,15 +600,8 @@ export default Vue.extend({
       this.allPages = 0
       this.result = ''
       this.imgUrl = ''
-      lottie.loadAnimation({
-        container: this.$refs.lottieDiv,
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        animationData: require('@/assets/lottie/scan.json')
-      })
     }
-  },
+  }
 })
 </script>
 

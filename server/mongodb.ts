@@ -8,7 +8,7 @@ let dbG: any = null
 
 export const Jobs = async (): Promise<number> => {
   const collection: Collection = dbG.collection('jobs')
-  const jobsInWork = await collection.find({ 'lastFinishedAt': { $exists: false } }).toArray()
+  const jobsInWork = await collection.find({ lastFinishedAt: { $exists: false } }).toArray()
   return jobsInWork.length
 }
 

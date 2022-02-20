@@ -58,7 +58,7 @@ export default {
   },
 
   server: {
-    port: 4500,
+    port: 4500
   },
 
   vuetify: {

@@ -2,7 +2,9 @@
   <section class="wrapper">
     <div class="content">
       <div class="title">
-        <h2 class="text-font text-bold">کار شما به اتمام رسید</h2>
+        <h2 class="text-font text-bold">
+          کار شما به اتمام رسید
+        </h2>
       </div>
       <div class="section-sub">
         <p class="text-font text-light text-right">
@@ -29,7 +31,7 @@
 import Vue from 'vue'
 
 export default Vue.extend({
-  name: 'Donate',
+  name: 'DonateComponent',
   props: {
     downloadLink: String
   }
@@ -43,7 +45,6 @@ export default Vue.extend({
   display: flex;
   justify-content: center;
   align-items: center;
-
 
   .content {
     background: #fff;
@@ -76,7 +77,6 @@ export default Vue.extend({
       letter-spacing: 0;
     }
 
-
     @media screen and (max-width: 720px) {
       .content {
         margin-right: 20px !important;
@@ -90,6 +90,5 @@ export default Vue.extend({
   }
 
 }
-
 
 </style>

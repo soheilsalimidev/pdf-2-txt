@@ -11,7 +11,7 @@ export const sendServerStatus = async (socketId: string) => {
   io?.to(socketId).emit('status', remainJobs - 1)
 }
 
-export const sendResult = async (socketId: string, fileName: string) => {
+export const sendResult = (socketId: string, fileName: string) => {
   io?.to(socketId).emit('result', fileName)
 }
 
@@ -23,7 +23,6 @@ export default (server: Server) => {
       console.log('Made socket connection ' + socket.id)
 
       socket.on('addJob', async (job) => {
-
         await jobQueue.now('ocrPdf', {
           filename: job.savedFileName + '.pdf',
           lang: job.lang,

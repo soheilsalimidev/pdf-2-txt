@@ -2,7 +2,9 @@
   <section class="wrapper">
     <div class="content">
       <div class="title">
-        <h2 class="text-font text-bold">شما در صف قرار گرفتید</h2>
+        <h2 class="text-font text-bold">
+          شما در صف قرار گرفتید
+        </h2>
       </div>
       <div class="section-sub">
         <p class="text-font text-light text-right">
@@ -19,7 +21,7 @@
           label="ایمیل"
           persistent-hint
           prepend-icon="mdi-email"
-        ></v-text-field>
+        />
         <v-btn
           class="text-font btn"
           color="primary"
@@ -50,7 +52,6 @@ export default Vue.extend({
   display: flex;
   justify-content: center;
   align-items: center;
-
 
   .content {
     background: #fff;
@@ -83,7 +84,6 @@ export default Vue.extend({
       letter-spacing: 0;
     }
 
-
     @media screen and (max-width: 720px) {
       .content {
         margin-right: 20px !important;
@@ -97,6 +97,5 @@ export default Vue.extend({
   }
 
 }
-
 
 </style>
