@@ -19,6 +19,7 @@
           class="text-font btn"
           color="primary"
           elevation="2"
+          @click="window.open('https://zarinp.al/soheilsalimi' , '_blank')"
         >
           حمایت کردن
         </v-btn>

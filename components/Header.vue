@@ -3,31 +3,21 @@
     <div class="headerMenuContainer">
       <div class="logo-menu">
         <div class="logo">
-          <v-img :src="require('@/static/icon.png')" width="50"/>
+          <v-img :src="require('@/static/logo.png')" width="230"/>
         </div>
-        <ul>
-          <li class="text-font text-bold">
-            خانه
-          </li>
-          <li class="text-font text-medium">
-            چگونه
-          </li>
-          <li class="text-font text-medium">
-            کجا
-          </li>
-        </ul>
       </div>
       <v-btn
         class="text-font text-bold btn"
         color="#09915A"
         elevation="5"
         light
+        @click="donate"
       >
         حمایت کردن
       </v-btn>
     </div>
     <div ref="bodyHeader" class="headerBodyContainer" @mousemove="moving">
-      <div style="align-self: baseline;">
+      <div class="moving-icon-container" style="align-self: baseline;">
         <div v-for="(po,index) in btnPo" :key="index" class="img-small">
           <v-img
             :src="po.image"
@@ -39,12 +29,12 @@
       </div>
 
       <h1 class="text-font text-center text-black">
-        ،هر نوع پی دی اف ی را که دارید
+        هر نوع پی دی اف ی را که دارید،
         <br>
         می توانید به ورد تبدیل کنید
       </h1>
       <h4 class="text-font text-center">
-        OCR با استفاده از هوش مصنوعی و تنکولوژی
+        با استفاده از هوش مصنوعی و تنکولوژی OCR
       </h4>
 
       <v-card
@@ -260,61 +250,47 @@ export default Vue.extend({
     return {
       btnPo: [
         {
-          image: require('@/static/icon.png'),
+          image: require('@/static/ocr.png'),
           top: 0,
           left: this.percent(15),
           topNew: 0,
           leftNew: self.percent(15)
         },
         {
-          image: require('@/static/icon.png'),
-          top: 60,
-          left: self.percent(2),
-          topNew: 60,
-          leftNew: self.percent(2)
+          image: require('@/static/ocr-1.png'),
+          top: 180,
+          left: self.percent(85),
+          topNew: 180,
+          leftNew: self.percent(85)
         },
         {
-          image: require('@/static/icon.png'),
+          image: require('@/static/pdf.png'),
           top: 400,
           left: self.percent(8),
           topNew: 400,
           leftNew: self.percent(8)
         },
         {
-          image: require('@/static/icon.png'),
+          image: require('@/static/ocr-3.png'),
           top: 380,
           left: self.percent(25),
           topNew: 380,
           leftNew: self.percent(25)
         },
         {
-          image: require('@/static/icon.png'),
+          image: require('@/static/ocr-2.png'),
           top: 50,
           left: self.percent(30),
           topNew: 50,
           leftNew: self.percent(30)
         },
         {
-          image: require('@/static/icon.png'),
+          image: require('@/static/txt.png'),
           top: 20,
           left: self.percent(80),
           topNew: 20,
           leftNew: self.percent(80)
         },
-        {
-          image: require('@/static/icon.png'),
-          top: 400,
-          left: self.percent(90),
-          topNew: 400,
-          leftNew: self.percent(90)
-        },
-        {
-          image: require('@/static/icon.png'),
-          top: 400,
-          left: self.percent(50),
-          topNew: 400,
-          leftNew: self.percent(50)
-        }
       ],
       fileOb: {},
       imgUrl: '',
@@ -600,6 +576,9 @@ export default Vue.extend({
       this.allPages = 0
       this.result = ''
       this.imgUrl = ''
+    },
+    donate () {
+      window.open('https://zarinp.al/soheilsalimi', '_blank')
     }
   }
 })
@@ -628,14 +607,6 @@ export default Vue.extend({
         margin-right: 2em;
       }
 
-      ul {
-        margin-right: 2em;
-
-        li {
-          margin-right: 1.5em;
-          display: inline-block;
-        }
-      }
     }
   }
 
@@ -722,6 +693,12 @@ export default Vue.extend({
 
     }
 
+  }
+
+  @media screen and (max-width: 600px) {
+    .moving-icon-container {
+      display: none;
+    }
   }
 }
 </style>

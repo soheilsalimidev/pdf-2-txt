@@ -1,9 +1,9 @@
 import colors from 'vuetify/es5/util/colors'
 
-export default {
+module.exports = {
   head: {
-    titleTemplate: '%s - PDS',
-    title: 'PDS',
+    titleTemplate: '%s - تبدیل pdf به ورد',
+    title: 'pdf2txt',
     meta: [
       { charset: 'utf-8' },
       {
@@ -58,7 +58,7 @@ export default {
   },
 
   server: {
-    port: 4500
+    port: 3000
   },
 
   vuetify: {

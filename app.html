@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<!--[if IE 9]>
+<html class="lt-ie9 ie9" {{ HTML_ATTRS }}><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<html HTML_ATTRS {{ }}><!--<![endif]-->
+<head HEAD_ATTRS {{ }}>
+  {{ HEAD }}
+  <script type="text/javascript">
+    (function () {
+      var now = new Date()
+      var head = document.getElementsByTagName('head')[0]
+      var script = document.createElement('script')
+      script.async = true
+      var script_address = 'https://cdn.yektanet.com/js/pdf2txt.ir/native-pdf2txt.ir-23817.js'
+      script.src = script_address + '?v=' + now.getFullYear().toString() + '0' + now.getMonth() + '0' + now.getDate() + '0' + now.getHours()
+      head.appendChild(script)
+    })()
+  </script>
+</head>
+<body BODY_ATTRS {{ }}>
+{{ APP }}
+</body>
+</html>
