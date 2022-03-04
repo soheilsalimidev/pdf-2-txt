@@ -2,8 +2,11 @@ import colors from 'vuetify/es5/util/colors'
 
 module.exports = {
   head: {
-    titleTemplate: '%s - تبدیل pdf به ورد',
+    titleTemplate: '%s - تبدیل پی دی اف به ورد - تبدیل pdf به word - ',
     title: 'pdf2txt',
+    htmlAttrs: {
+      lang: 'fa'
+    },
     meta: [
       { charset: 'utf-8' },
       {
@@ -13,7 +16,7 @@ module.exports = {
       {
         hid: 'description',
         name: 'description',
-        content: 'تدبیل pdf به word'
+        content: 'تبدیل هرنوع پی دی اف به ورد با استفاده از هوش مصنوعی OCR'
       },
       {
         name: 'format-detection',
